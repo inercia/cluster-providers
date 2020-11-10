@@ -1,0 +1,32 @@
+name: "Kubernetes Cluster providers"
+description: "Create and destroy Kubernetes clusters in a portable manner."
+author: "alvaro.saurin@gmail.com"
+branding:
+  color: blue
+  icon: cloud
+inputs:
+  provider:
+    description: "The Kubernetes cluster provider (ie, k3d, kind, gke...)"
+    required: true
+  command:
+    description: "The command to run (ie, create, delete...)"
+    required: true
+  name:
+    description: "The name of the cluster. It should be unique but constant in your workflow."
+    required: false
+  size:
+    description: "The total number of nodes in the cluster (including master and worker nodes)"
+    required: false
+  machine:
+    description: "(for some providers) The node size or 'model', depending on the cluster provider (ie, on Azure it can be something like 'Standard_D2s_v3')"
+    required: false
+  region:
+    description: "(for some providers) The cluster location (ie, 'us-east1-b' on GKE)"
+    required: false
+  registry:
+    description: "(for some providers) A custom name for the registry in the cluster"
+    required: false
+
+runs:
+  using: "node12"
+  main: ".github/action/main.js"

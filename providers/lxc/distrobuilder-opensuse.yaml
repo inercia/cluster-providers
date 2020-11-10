@@ -1,0 +1,181 @@
+#
+# openSUSE definition file
+#
+###################################################################################
+# NOTE: make sure you REMOVE the old image (with `lxc delete opensuse`)
+#       AFTER MODIFYING THIS FILE
+###################################################################################
+
+image:
+  distribution: openSUSE
+  release: 15.0
+  description: openSUSE Leap {{ image.release }} with kubeadm
+  expiry: 30d
+  architecture: x86_64
+
+source:
+  downloader: opensuse-http
+  url: https://download.opensuse.org
+  skip_verification: true
+
+targets:
+  lxc:
+    create-message: |
+      You just created an openSUSE Leap container (release={{ image.release }}, arch={{ image.architecture }})
+
+    config:
+      - type: all
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/opensuse.common.conf
+
+      - type: user
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/opensuse.userns.conf
+
+      - type: all
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/common.conf
+
+      - type: user
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/userns.conf
+
+      - type: all
+        content: |-
+          lxc.arch = {{ image.architecture_kernel }}
+
+files:
+  - path: /etc/hostname
+    generator: hostname
+
+  - path: /etc/hosts
+    generator: hosts
+
+  - name: ifcfg-eth0.lxd
+    path: /etc/sysconfig/network/ifcfg-eth0
+    generator: template
+    content: |-
+      STARTMODE='auto'
+      BOOTPROTO='dhcp'
+      HOSTNAME={{ container.name }}
+      DHCP_HOSTNAME=`hostname`
+
+  # From the version v11.0 kubelet requires to have shared mode for the host mounts.
+  # There is dirty hack for achieve that, inside LXC-container run:
+  # see https://medium.com/@kvaps/run-kubernetes-in-lxc-container-f04aa94b6c9c
+  - path: /etc/init.d/boot.local
+    generator: dump
+    content: |-
+      #!/bin/sh -e
+      mount --make-rshared /
+
+      echo ">>> linking /dev/kmsg"
+      [ -e /dev/kmsg ] || ln -s /dev/console /dev/kmsg
+
+  - path: /etc/cni/net.d/99-loopback.conf
+    generator: dump
+    content: |-
+      {
+        "cniVersion": "0.2.0",
+        "name": "lo",
+        "type": "loopback"
+      }
+
+packages:
+  manager: zypper
+  update: false
+  refresh: true
+  cleanup: true
+  repositories:
+    - name: kubic
+      url: https://download.opensuse.org/repositories/devel:/kubic/openSUSE_Leap_15.1/
+  sets:
+    - packages:
+        - systemd-sysvinit
+        - openssh
+        - sudo
+        - sshpass
+        - less
+        - apparmor-abstractions
+        - elfutils
+        - file
+        - glib2-tools
+        - gzip
+        - hardlink
+        - hostname
+        - iputils
+        - net-tools
+        - openslp
+        - rsync
+        - shared-mime-info
+        - which
+        - vim
+        - kubectl
+        - haproxy
+        - docker
+        - python3
+      action: install
+
+actions:
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      mkdir -p /etc/cni/net.d
+      # NOTE: CNI plugins are installed in /usr/lib/cni in OpenSUSE
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+
+      # encrypted "linux"
+      # obtained with `echo "linux" | openssl passwd -1 -stdin`
+      ROOT_PASSWORD='$1$62xujQ/G$IxTMM4LZimNXF3LFcBawC1'
+
+      echo ">>> setting a trivial password for root and allowing SSH for root"
+      echo "root:$ROOT_PASSWORD" | /usr/sbin/chpasswd -e
+      echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+
+      echo ">>> fixing authorized keys"
+      mkdir -p /root/.ssh
+      chmod 700 /root/.ssh
+      touch /root/.ssh/authorized_keys
+      chmod 600 /root/.ssh/authorized_keys
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+
+      echo ">>> making sure some packages are not installed..."
+      rpm -e --nodeps docker-kubic docker-libnetwork-kubic docker-runc-kubic || /bin/true
+
+      echo ">>> enabling some services..."
+      systemctl enable sshd
+      systemctl enable docker
+      systemctl disable crio
+
+      echo ">>> making sure python exists..."
+      [ -e /usr/bin/python ] || ln -s /usr/bin/python3 /usr/bin/python
+
+      # some commands are really useless in a LXC container, so we create "fake" clones:
+      for target in /usr/bin/kmod /sbin/sysctl ; do
+        rm -f $target
+        ln -s /bin/true $target
+      done
+
+  - trigger: post-files
+    action: |-
+      #!/bin/sh
+
+      echo ">>> fixing boot.local"
+      chmod 755 /etc/init.d/boot.local
+      ln -s /etc/init.d/boot.local /etc/rc.local
+      sh /etc/init.d/boot.local
+
+environment:
+  variables:
+    - key: HOME
+      value: /root

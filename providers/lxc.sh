@@ -42,6 +42,8 @@ lxc_seq_workers() {
 
 #########################################################################################
 
+[ -n "$1" ] || abort "no command provided"
+
 # references:
 # - https://linuxcontainers.org/lxd/getting-started-cli/
 # -

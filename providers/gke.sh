@@ -161,6 +161,8 @@ gke_delete_cluster() {
 
 #########################################################################################
 
+[ -n "$1" ] || abort "no command provided"
+
 case $1 in
 #
 # setup and cleanup

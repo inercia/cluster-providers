@@ -17,9 +17,6 @@ DEF_WAIT_TIMEOUT=100
 CLUSTER_PROVIDER="${CLUSTER_PROVIDER:-}"
 DEF_CLUSTER_PROVIDER="dummy"
 
-# default cluster machine name
-DEF_CLUSTER_MACHINE="default"
-
 # the kubeconfig, and possible kubeconfig files, and the default one
 DEV_KUBECONFIG="${DEV_KUBECONFIG:-}"
 DEF_KUBECONFIG="${HOME}/.kube/config"

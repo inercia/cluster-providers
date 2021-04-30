@@ -35,6 +35,8 @@ DEF_KUBECONFIG="$HOME/.kube/config"
 
 #########################################################################################
 
+[ -n "$1" ] || abort "no command provided"
+
 mkdir -p "$HOME/.kube"
 
 case $1 in

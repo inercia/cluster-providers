@@ -11,6 +11,8 @@ source "$dummy_prov_dir/../common.sh"
 
 #########################################################################################
 
+[ -n "$1" ] || abort "no command provided"
+
 case $1 in
 create)
 	[ -n "$KUBECONFIG" ] || [ -n "$DEV_KUBECONFIG" ] || abort "the dummy cluster provider needs a KUBECONFIG/DEV_KUBECONFIG"

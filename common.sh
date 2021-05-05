@@ -22,7 +22,7 @@ DEV_KUBECONFIG="${DEV_KUBECONFIG:-}"
 DEF_KUBECONFIG="${HOME}/.kube/config"
 
 # the registry. by default, a local one.
-DEV_REGISTRY="${DEV_REGISTRY:-}"
+REGISTRY="${REGISTRY:-}"
 DEF_REGISTRY="registry.local:5000"
 
 ########################################################################################################################

@@ -47,7 +47,7 @@ and then we can get the configuration for this cluster with:
 ```console
 $ CLUSTER_PROVIDER=k3d ./providers.sh get-env
 >>> (cluster provider: k3d: get-env)
-DEV_REGISTRY=registry.localhost:5000
+REGISTRY=registry.localhost:5000
 DOCKER_NETWORK=k3d-operator-tests-alvaro-0
 DEV_KUBECONFIG=/home/alvaro/.config/k3d/operator-tests-alvaro-0/kubeconfig.yaml
 KUBECONFIG=/home/alvaro/.config/k3d/operator-tests-alvaro-0/kubeconfig.yaml

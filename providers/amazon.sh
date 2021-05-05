@@ -1,3 +1,22 @@
+#!/usr/bin/env bash
+#
+#    ADOBE CONFIDENTIAL
+#    ___________________
+#
+#    Copyright 2021 Adobe Systems Incorporated
+#    All Rights Reserved.
+#
+#    NOTICE:  All information contained herein is, and remains
+#    the property of Adobe Systems Incorporated and its suppliers,
+#    if any.  The intellectual and technical concepts contained
+#    herein are proprietary to Adobe Systems Incorporated and its
+#    suppliers and are protected by all applicable intellectual property
+#    laws, including trade secret and copyright laws.
+#    Dissemination of this information or reproduction of this material
+#    is strictly forbidden unless prior written permission is obtained
+#    from Adobe Systems Incorporated.
+#
+
 #!/bin/bash
 
 amazon_provider_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
@@ -17,16 +36,16 @@ EXE_EKSCTL="$HOME/bin/eksctl"
 EXE_EKSCTL_URL="https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz"
 
 # the cluster name
-EKS_CLUSTER="amb-oper-tests"
+EKS_CLUSTER="oper-tests"
 
 # number of nodes
 EKS_CLUSTER_NUM_NODES=1
 
 # the registry name
-EKS_REGISTRY="amb-oper-reg"
+EKS_REGISTRY="oper-reg"
 
 # resource group
-AZ_RES_GRP="amb-oper-tests"
+AZ_RES_GRP="oper-tests"
 
 # cluster location
 AZ_LOC="eastus"
@@ -137,7 +156,7 @@ get-env)
 	export_env "KUBECONFIG" "$DEF_KUBECONFIG"
 
 	# TODO
-	export_env "DEV_REGISTRY" ""
+	export_env "REGISTRY" ""
 	;;
 
 *)

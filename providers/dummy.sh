@@ -16,7 +16,7 @@ source "$dummy_prov_dir/../common.sh"
 case $1 in
 create)
 	[ -n "$KUBECONFIG" ] || [ -n "$DEV_KUBECONFIG" ] || abort "the dummy cluster provider needs a KUBECONFIG/DEV_KUBECONFIG"
-	[ -n "$DEV_REGISTRY" ] || abort "the dummy cluster provider needs a DEV_REGISTRY"
+	[ -n "$REGISTRY" ] || abort "the dummy cluster provider needs a REGISTRY"
 	;;
 
 #
@@ -31,8 +31,8 @@ get-env)
 		export_env "KUBECONFIG" "$DEV_KUBECONFIG"
 	fi
 
-	if [ -n "$DEV_REGISTRY" ]; then
-		export_env "DEV_REGISTRY" "$DEV_REGISTRY"
+	if [ -n "$REGISTRY" ]; then
+		export_env "REGISTRY" "$REGISTRY"
 	fi
 	;;
 

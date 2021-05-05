@@ -204,7 +204,7 @@ exists)
 # get the environment vars
 #
 get-env)
-  export_env "DEV_REGISTRY" "${KIND_REGISTRY}"
+  export_env "REGISTRY" "${KIND_REGISTRY}"
   export_env "DOCKER_NETWORK" "${KIND_NETWORK_NAME}"
 
   export_env "DEV_KUBECONFIG" "${KIND_KUBECONFIG}"

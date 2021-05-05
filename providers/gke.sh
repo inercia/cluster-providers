@@ -1,3 +1,22 @@
+#!/usr/bin/env bash
+#
+#    ADOBE CONFIDENTIAL
+#    ___________________
+#
+#    Copyright 2021 Adobe Systems Incorporated
+#    All Rights Reserved.
+#
+#    NOTICE:  All information contained herein is, and remains
+#    the property of Adobe Systems Incorporated and its suppliers,
+#    if any.  The intellectual and technical concepts contained
+#    herein are proprietary to Adobe Systems Incorporated and its
+#    suppliers and are protected by all applicable intellectual property
+#    laws, including trade secret and copyright laws.
+#    Dissemination of this information or reproduction of this material
+#    is strictly forbidden unless prior written permission is obtained
+#    from Adobe Systems Incorporated.
+#
+
 #!/bin/bash
 
 # Input env vars:
@@ -29,7 +48,7 @@ GKE_INSTALL_DIR=${GKE_INSTALL_DIR:-$HOME/google-cloud-sdk}
 EXE_GCLOUD="$GKE_INSTALL_DIR/bin/gcloud"
 
 # the cluster name
-GKE_CLUSTER="${CLUSTER_NAME:-amb-oper-tests-$user-$num}"
+GKE_CLUSTER="${CLUSTER_NAME:-oper-tests-$user-$num}"
 
 # number of nodes
 GKE_CLUSTER_NUM_NODES="${CLUSTER_SIZE:-1}"
@@ -302,7 +321,7 @@ delete-registry)
 get-env)
 	export_env "DEV_KUBECONFIG" "$GKE_KUBECONFIG"
 	export_env "KUBECONFIG" "$GKE_KUBECONFIG"
-	export_env "DEV_REGISTRY" "$(gke_docker_registry)"
+	export_env "REGISTRY" "$(gke_docker_registry)"
 
 	export_env "CLUSTER_NAME" "$GKE_CLUSTER"
 	export_env "CLUSTER_SIZE" "$GKE_CLUSTER_NUM_NODES"

@@ -150,8 +150,8 @@ get-env)
   export_env "CLUSTER_MACHINE" ""
   export_env "CLUSTER_REGION" ""
 
-  if [ -n "$DEV_REGISTRY" ]; then
-    export_env "DEV_REGISTRY" "$DEV_REGISTRY"
+  if [ -n "$REGISTRY" ]; then
+    export_env "REGISTRY" "$REGISTRY"
   fi
 
   all_ips=""

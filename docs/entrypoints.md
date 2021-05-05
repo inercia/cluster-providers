@@ -26,7 +26,7 @@ will be returned in `get-env` as `KUBECONFIG`.
 with `create`.
 - **`create-registry`**: create a registry or login into an
 existing one. The registry will be returned in `get-env` as
-`DEV_REGISTRY`.
+`REGISTRY`.
 - **`delete-registry`**: release the current registry or cleanup
 any resources.
 - **`get-env`**: get any environment variables necessary for using

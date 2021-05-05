@@ -199,7 +199,7 @@ exists)
 # get the environment vars
 #
 get-env)
-    export_env "DEV_REGISTRY" "k3d-${K3D_REGISTRY}"
+    export_env "REGISTRY" "k3d-${K3D_REGISTRY}"
     export_env "DOCKER_NETWORK" "${K3D_NETWORK_NAME}"
 
     export_env "DEV_KUBECONFIG" "$K3D_KUBECONFIG"

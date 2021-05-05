@@ -17,7 +17,7 @@
 
 ## Output variables: getting info for using the cluster
 
-* `DEV_REGISTRY`: the registry created (ie, `registry.localhost:5000`).
+* `REGISTRY`: the registry created (ie, `registry.localhost:5000`).
 * `KUBECONFIG`: the kubeconfig generated for connecting to the API server in this cluster.
 * `DEV_KUBECONFIG`: same as `KUBECONFIG`.
 * `CLUSTER_NAME`: a unique cluster name. Will be the `CLUSTER_NAME` provided when it was not empty.

@@ -1,3 +1,22 @@
+#!/usr/bin/env bash
+#
+#    ADOBE CONFIDENTIAL
+#    ___________________
+#
+#    Copyright 2021 Adobe Systems Incorporated
+#    All Rights Reserved.
+#
+#    NOTICE:  All information contained herein is, and remains
+#    the property of Adobe Systems Incorporated and its suppliers,
+#    if any.  The intellectual and technical concepts contained
+#    herein are proprietary to Adobe Systems Incorporated and its
+#    suppliers and are protected by all applicable intellectual property
+#    laws, including trade secret and copyright laws.
+#    Dissemination of this information or reproduction of this material
+#    is strictly forbidden unless prior written permission is obtained
+#    from Adobe Systems Incorporated.
+#
+
 #!/bin/bash
 
 # Input env vars:
@@ -28,7 +47,7 @@ num="${TRAVIS_BUILD_ID:-0}"
 EXE_AZ="az"
 
 # the cluster name
-AZ_CLUSTER="${CLUSTER_NAME:-amb-oper-tests-$user-$num}"
+AZ_CLUSTER="${CLUSTER_NAME:-oper-tests-$user-$num}"
 
 # number of nodes
 AZ_CLUSTER_NUM_NODES="${CLUSTER_SIZE:-1}"
@@ -444,7 +463,7 @@ get-env)
 
   export_env "DEV_KUBECONFIG" "$kc"
   export_env "KUBECONFIG" "$kc"
-  export_env "DEV_REGISTRY" "$registry"
+  export_env "REGISTRY" "$registry"
 
   export_env "CLUSTER_NAME" "$AZ_CLUSTER"
   export_env "CLUSTER_SIZE" "$AZ_CLUSTER_NUM_NODES"

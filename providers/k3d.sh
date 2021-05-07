@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 k3d_prov_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 [ -d "$k3d_prov_dir" ] || {
@@ -24,7 +24,7 @@ K3D_CLUSTER_NAME="${CLUSTER_NAME:-cluster-$user-$num}"
 
 K3D_KUBECONFIG="/tmp/k3d-kubeconfig-${K3D_CLUSTER_NAME}"
 
-K3D_NETWORK_NAME="k3d-$K3D_CLUSTER_NAME"
+K3D_NETWORK_NAME="${K3D_NETWORK_NAME:-k3d-$K3D_CLUSTER_NAME}"
 
 K3D_API_PORT=${K3D_API_PORT:-6444}
 
@@ -38,9 +38,17 @@ K3D_NUM_WORKERS=0
 
 K3D_EXTRA_ARGS="${K3D_EXTRA_ARGS:-}"
 
-K3D_ARGS="--wait --api-port ${K3D_API_PORT} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
+K3D_ARGS="--wait --api-port ${K3D_API_PORT} --network ${K3D_NETWORK_NAME} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
+
+# set to anything for setting up /etc/hosts for the registry
+K3D_SETUP_HOSTS=${K3D_SETUP_HOSTS:-}
+
+# set to anything for replacing the 0.0.0.0 host by the actual IP in the kubeconfig
+K3D_REPLACE_HOST=${K3D_REPLACE_HOST:-}
 
 #########################################################################################
+
+SUDO=${SUDO:-sudo}
 
 export PATH=$PATH:$(dirname $K3D_INSTALL_EXE)
 
@@ -64,8 +72,8 @@ replace_ip_kubeconfig() {
     local kc="$1"
     local current_ip=$(get_k3d_server_ip)
 
-    info "Replacing 127.0.0.1 by $current_ip"
-    for addr in "127.0.0.1" "localhost"; do
+    info "Replacing 0.0.0.0 by $current_ip"
+    for addr in "0.0.0.0" "localhost"; do
         sed -i -e 's/'$addr'\b/'$current_ip'/g' "$kc"
     done
 }
@@ -75,7 +83,8 @@ create_registry() {
         info "k3d registry alreay exists"
     else
         info "Creating k3d registry..."
-        $K3D_EXE registry create "$K3D_REGISTRY_NAME" --port $K3D_REGISTRY_PORT || abort
+        $K3D_EXE registry create "$K3D_REGISTRY_NAME" \
+            --port $K3D_REGISTRY_PORT || abort
     fi
 }
 
@@ -86,7 +95,7 @@ create_cluster() {
     KUBECONFIG="$K3D_KUBECONFIG" $K3D_EXE cluster create --agents $K3D_NUM_WORKERS $K3D_ARGS "$K3D_CLUSTER_NAME" || abort
     sleep 3
 
-    # replace_ip_kubeconfig "$K3D_KUBECONFIG"
+    [ -n "$K3D_REPLACE_HOST" ] && replace_ip_kubeconfig "$K3D_KUBECONFIG"
 
     info "Showing some k3d cluster info:"
     kubectl --kubeconfig="$K3D_KUBECONFIG" cluster-info || abort
@@ -116,17 +125,19 @@ setup)
         info "k3d seems to be installed"
     fi
 
-    info "Checking that $K3D_REGISTRY_NAME is resolvable"
-    grep -q $K3D_REGISTRY_NAME /etc/hosts
-    if [ $? -ne 0 ]; then
-        if [ -z "$IS_CI" ] && [ -z "$CI" ] ; then
-            abort "$K3D_REGISTRY_NAME is not in /etc/hosts: please add an entry manually."
-        fi
+    if [ -n "$K3D_SETUP_HOSTS" ] ; then
+        info "Checking that $K3D_REGISTRY_NAME is resolvable"
+        grep -q "$K3D_REGISTRY_NAME" /etc/hosts
+        if [ $? -ne 0 ]; then
+            if [ -z "$IS_CI" ] && [ -z "$CI" ] ; then
+                warn "$K3D_REGISTRY_NAME is not in /etc/hosts: please add an entry manually."
+            fi
 
-        info "Adding '127.0.0.1 $K3D_REGISTRY_NAME' to /etc/hosts"
-        echo "127.0.0.1 $K3D_REGISTRY_NAME" | sudo tee -a /etc/hosts
-    else
-        passed "... good: $K3D_REGISTRY_NAME is in /etc/hosts"
+            info "Adding '127.0.0.1 $K3D_REGISTRY_NAME' to /etc/hosts"
+            echo "127.0.0.1 $K3D_REGISTRY_NAME" | $SUDO tee -a /etc/hosts || warn "could not add $K3D_REGISTRY_NAME to /etc/hosts"
+        else
+            passed "... good: $K3D_REGISTRY_NAME is in /etc/hosts"
+        fi
     fi
     ;;
 

@@ -43,6 +43,8 @@ num="${TRAVIS_BUILD_ID:-0}"
 
 #########################################################################################
 
+EXE_DIR=${EXE_DIR:-/usr/local/bin}
+
 # the az executable
 EXE_AZ="az"
 
@@ -218,8 +220,8 @@ case $1 in
 # setup and cleanup
 #
 setup)
-  mkdir -p "$HOME/bin"
-  export PATH=$HOME/bin:$PATH
+  mkdir -p "$EXE_DIR"
+  export PATH=$EXE_DIR:$PATH
 
   info "Installing dependencies..."
   sudo apt-get update

@@ -14,9 +14,11 @@ num="${TRAVIS_BUILD_ID:-0}"
 
 #########################################################################################
 
+EXE_DIR=${EXE_DIR:-/usr/local/bin}
+
 K3D_EXE="k3d"
 
-K3D_INSTALL_EXE="$HOME/bin/k3d"
+K3D_INSTALL_EXE="$EXE_DIR/k3d"
 
 K3D_INST_URL="https://raw.githubusercontent.com/rancher/k3d/main/install.sh"
 

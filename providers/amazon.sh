@@ -30,8 +30,10 @@ source "$amazon_provider_dir/../common.sh"
 
 #########################################################################################
 
+EXE_DIR=${EXE_DIR:-/usr/local/bin}
+
 # the az executable
-EXE_EKSCTL="$HOME/bin/eksctl"
+EXE_EKSCTL="$EXE_DIR/eksctl"
 
 EXE_EKSCTL_URL="https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz"
 
@@ -63,8 +65,8 @@ case $1 in
 # setup and cleanup
 #
 setup)
-	mkdir -p "$HOME/bin"
-	export PATH=$HOME/bin:$PATH
+	mkdir -p "$EXE_DIR"
+	export PATH=$EXE_DIR:$PATH
 
 	if ! command_exists "aws"; then
 		info "Installing aws"

@@ -40,6 +40,8 @@ num="${TRAVIS_BUILD_ID:-0}"
 
 #########################################################################################
 
+EXE_DIR=${EXE_DIR:-/usr/local/bin}
+
 # installation directory
 # NOTE: the last part must be "google-cloud-sdk"... you better do not change this
 GKE_INSTALL_DIR=${GKE_INSTALL_DIR:-$HOME/google-cloud-sdk}
@@ -187,8 +189,8 @@ case $1 in
 # setup and cleanup
 #
 setup)
-	mkdir -p "$HOME/bin"
-	export PATH=$HOME/bin:$PATH
+	mkdir -p "$EXE_DIR"
+	export PATH=$EXE_DIR:$PATH
 
 	if [ -x "$EXE_GCLOUD" ]; then
 		info "Google Cloud SDK seems to be installed at $GKE_INSTALL_DIR"

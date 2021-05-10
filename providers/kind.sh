@@ -14,9 +14,11 @@ num="${TRAVIS_BUILD_ID:-0}"
 
 #########################################################################################
 
+EXE_DIR=${EXE_DIR:-/usr/local/bin}
+
 KIND_EXE="kind"
 
-KIND_INSTALL_EXE="$HOME/bin/kind"
+KIND_INSTALL_EXE="$EXE_DIR/kind"
 
 KIND_HTTP_PORT=${KIND_HTTP_PORT:-80}
 

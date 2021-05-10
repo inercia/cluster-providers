@@ -43,14 +43,14 @@ BLOCK='\033[1;47m'
 # tools
 ########################################################################################################################
 
+EXE_DIR=${EXE_DIR:-/usr/local/bin}
+
 # some executables
 EXE_SIEGE="siege"
-EXE_KUBECTL=${KUBECTL:-$HOME/bin/kubectl}
-EXE_KUBERNAUT=${KUBERNAUT:-$HOME/bin/kubernaut}
-EXE_EDGECTL=${EDGECTL:-$HOME/bin/edgectl}
-EXE_OSDK=${OSDK:-$HOME/bin/operator-sdk}
-EXE_SHFMT=${SHFMT:-$HOME/bin/shfmt}
-EXE_HELM=${HELM:-$HOME/bin/helm}
+EXE_KUBECTL=${KUBECTL:-$EXE_DIR/kubectl}
+EXE_OSDK=${OSDK:-$EXE_DIR/operator-sdk}
+EXE_SHFMT=${SHFMT:-$EXE_DIR/shfmt}
+EXE_HELM=${HELM:-$EXE_DIR/helm}
 
 # some versions
 KUBECTL_VERSION="1.15.3"

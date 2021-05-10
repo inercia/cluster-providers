@@ -62,8 +62,10 @@ create_cluster() {
     running="$(docker inspect -f '{{.State.Running}}' "${KIND_REGISTRY_NAME}" 2>/dev/null || true)"
     if [ "${running}" != 'true' ]; then
       docker run \
-        -d --restart=always -p "${KIND_REGISTRY_PORT}:5000" --name "${KIND_REGISTRY_NAME}" \
-        registry:2
+        --rm -d --restart=always \
+        -p "${KIND_REGISTRY_PORT}:5000" \
+        --name "${KIND_REGISTRY_NAME}" \
+        registry:2 || abort "when creating registry"
     fi
   fi
 

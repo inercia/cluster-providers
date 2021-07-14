@@ -75,7 +75,7 @@ get_k3d_server_ip() {
 }
 
 check_registry_exists() {
-    $K3D_EXE registry list | grep -q "$K3D_REGISTRY_NAME" >/dev/null 2>&1
+    $K3D_EXE registry list | grep -v "exited" | grep -q "$K3D_REGISTRY_NAME" >/dev/null 2>&1
 }
 
 check_k3d_cluster_exists() {

@@ -36,6 +36,10 @@ In some environments you can get:
 * `SSH_PASSWORD`: the ssh password required for connecting to the nodes of the cluster
   (will never be provided for machines created in the cloud, only for local environments).
 
+as well as some features or characteristics of the cluster, like:
+
+* IS_SAME_REGISTRY: uses the same registry
+
 Example for LXC:
 
 ```console

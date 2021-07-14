@@ -30,7 +30,11 @@ K3D_NETWORK_NAME="${K3D_NETWORK_NAME:-k3d-$K3D_CLUSTER_NAME}"
 
 K3D_API_PORT=${K3D_API_PORT:-6444}
 
-K3D_REGISTRY_NAME="${K3D_REGISTRY_NAME:-registry.localhost}"
+if [ "$(uname)" = "Darwin" ] ; then
+    K3D_REGISTRY_NAME="${K3D_REGISTRY_NAME:-registry}"
+else
+    K3D_REGISTRY_NAME="${K3D_REGISTRY_NAME:-registry.localhost}"
+fi
 
 K3D_REGISTRY_PORT="${K3D_REGISTRY_PORT:-5000}"
 
@@ -40,7 +44,7 @@ K3D_NUM_WORKERS=0
 
 K3D_EXTRA_ARGS="${K3D_EXTRA_ARGS:-}"
 
-K3D_ARGS="--wait --api-port ${K3D_API_PORT} --network ${K3D_NETWORK_NAME} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
+K3D_ARGS="--wait --no-lb --api-port ${K3D_API_PORT} --network ${K3D_NETWORK_NAME} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
 
 # set to anything for setting up /etc/hosts for the registry
 K3D_SETUP_HOSTS=${K3D_SETUP_HOSTS:-}
@@ -56,9 +60,18 @@ export PATH=$PATH:$(dirname $K3D_INSTALL_EXE)
 
 [ -n "$CLUSTER_SIZE" ] && K3D_NUM_WORKERS=$((CLUSTER_SIZE - 1))
 
+[ "$(uname)" = "Darwin" ] && {
+    info "Forcing /etc/hosts update"
+    K3D_SETUP_HOSTS=1
+}
+
+get_container_ips() {
+    local cont="$1"
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$cont"
+}
+
 get_k3d_server_ip() {
-    local cont="k3d-$K3D_CLUSTER_NAME-server-0"
-    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $cont
+    get_container_ips "k3d-$K3D_CLUSTER_NAME-server-0" | cut -d" " -f1
 }
 
 check_registry_exists() {
@@ -81,12 +94,43 @@ replace_ip_kubeconfig() {
 }
 
 create_registry() {
-    if check_registry_exists ; then
+    if check_registry_exists; then
         info "k3d registry alreay exists"
     else
         info "Creating k3d registry..."
         $K3D_EXE registry create "$K3D_REGISTRY_NAME" \
-            --port $K3D_REGISTRY_PORT || abort
+            --port $K3D_REGISTRY_PORT || abort "could not create registry"
+    fi
+
+    local registry_ip="127.0.0.1"
+
+    if [ -n "$K3D_SETUP_HOSTS" ]; then
+        info "Checking that $K3D_REGISTRY_NAME is resolvable"
+        if ! grep -q "$K3D_REGISTRY_NAME" /etc/hosts; then
+            if [ -z "$IS_CI" ] && [ -z "$CI" ]; then
+                warn "$K3D_REGISTRY_NAME is not in /etc/hosts: please add an entry manually."
+            fi
+
+            info "Adding '$registry_ip k3d-$K3D_REGISTRY_NAME' to /etc/hosts"
+            echo "$registry_ip k3d-$K3D_REGISTRY_NAME" | $SUDO tee -a /etc/hosts || warn "could not add $K3D_REGISTRY_NAME to /etc/hosts"
+        else
+            passed "... good: $K3D_REGISTRY_NAME is in /etc/hosts"
+        fi
+    fi
+}
+
+delete_registry() {
+    if check_registry_exists; then
+        info "K3D registry running: destroying..."
+        $K3D_EXE registry delete "$K3D_REGISTRY_NAME" || abort "could not destroy registry"
+
+        local registry_ip="127.0.0.1"
+        if [ -n "$K3D_SETUP_HOSTS" ]; then
+            if grep -q "$K3D_REGISTRY_NAME" /etc/hosts; then
+                info "Removing k3d-$K3D_REGISTRY_NAME from /etc/hosts"
+                $SUDO sed -i "/k3d-$K3D_REGISTRY_NAME/d" /etc/hosts || warn "could not delete $K3D_REGISTRY_NAME from /etc/hosts"
+            fi
+        fi
     fi
 }
 
@@ -125,21 +169,6 @@ setup)
         command_exists $K3D_EXE || abort "could not install k3d"
     else
         info "k3d seems to be installed"
-    fi
-
-    if [ -n "$K3D_SETUP_HOSTS" ] ; then
-        info "Checking that $K3D_REGISTRY_NAME is resolvable"
-        grep -q "$K3D_REGISTRY_NAME" /etc/hosts
-        if [ $? -ne 0 ]; then
-            if [ -z "$IS_CI" ] && [ -z "$CI" ] ; then
-                warn "$K3D_REGISTRY_NAME is not in /etc/hosts: please add an entry manually."
-            fi
-
-            info "Adding '127.0.0.1 $K3D_REGISTRY_NAME' to /etc/hosts"
-            echo "127.0.0.1 $K3D_REGISTRY_NAME" | $SUDO tee -a /etc/hosts || warn "could not add $K3D_REGISTRY_NAME to /etc/hosts"
-        else
-            passed "... good: $K3D_REGISTRY_NAME is in /etc/hosts"
-        fi
     fi
     ;;
 
@@ -196,9 +225,7 @@ create-registry)
     ;;
 
 delete-registry)
-    if check_registry_exists ; then
-        $K3D_EXE registry delete "$K3D_REGISTRY_NAME"
-    fi
+    delete_registry
     ;;
 
 #

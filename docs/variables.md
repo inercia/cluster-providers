@@ -24,6 +24,10 @@
 * `CLUSTER_SIZE`: (see the input environment variables)
 * `CLUSTER_MACHINE`: (see the input environment variables)
 * `CLUSTER_REGION`: (see the input environment variables)
+* `CLUSTER_API_ADDRS`: an (optional) list of API server addresses. This list if
+  not provided by all the cluster providers. The list contains all the possible
+  addresses where the API server can be located. It is responsability of the caller
+  to check which ones are reachable.
 
 In some environments you can get:
 

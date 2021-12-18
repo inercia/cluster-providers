@@ -149,6 +149,7 @@ get-env)
   export_env "CLUSTER_SIZE" $((LXC_NUM_WORKERS + 1))
   export_env "CLUSTER_MACHINE" ""
   export_env "CLUSTER_REGION" ""
+  export_env "CLUSTER_API_ADDRS" ""
 
   if [ -n "$REGISTRY" ]; then
     export_env "REGISTRY" "$REGISTRY"

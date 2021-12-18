@@ -471,6 +471,7 @@ get-env)
   export_env "CLUSTER_SIZE" "$AZ_CLUSTER_NUM_NODES"
   export_env "CLUSTER_MACHINE" "$AZ_CLUSTER_NODE_SIZE"
   export_env "CLUSTER_REGION" "$AZ_LOC"
+  export_env "CLUSTER_API_ADDRS" ""
 
   # azure-specific variables
   export_env "AZ_CLUSTER" "$AZ_CLUSTER"

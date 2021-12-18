@@ -218,6 +218,7 @@ get-env)
   export_env "CLUSTER_SIZE" "$((KIND_NUM_WORKERS + 1))"
   export_env "CLUSTER_MACHINE" ""
   export_env "CLUSTER_REGION" ""
+  export_env "CLUSTER_API_ADDRS" ""
 
   # kind-specific vars
   export_env "KIND_CLUSTER_NAME" "$KIND_CLUSTER_NAME"

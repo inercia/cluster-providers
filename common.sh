@@ -226,6 +226,6 @@ export_env() {
 	if [ -n "$GITHUB_ACTION" ] ; then
 		echo "::set-env name=${variable}::${value}"
 	else
-		echo "$variable=$value"
+		echo "$variable='$value'"
 	fi
 }

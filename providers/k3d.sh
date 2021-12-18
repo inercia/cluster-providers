@@ -30,13 +30,13 @@ K3D_NETWORK_NAME="${K3D_NETWORK_NAME:-k3d-$K3D_CLUSTER_NAME}"
 
 K3D_API_PORT=${K3D_API_PORT:-6444}
 
-if [ "$(uname)" = "Darwin" ] ; then
+if [ "$(uname)" = "Darwin" ]; then
     K3D_REGISTRY_NAME="${K3D_REGISTRY_NAME:-registry}"
 else
     K3D_REGISTRY_NAME="${K3D_REGISTRY_NAME:-registry.localhost}"
 fi
 
-K3D_REGISTRY_PORT="${K3D_REGISTRY_PORT:-5000}"
+K3D_REGISTRY_PORT="${K3D_REGISTRY_PORT:-5011}"
 
 K3D_REGISTRY="$K3D_REGISTRY_NAME:$K3D_REGISTRY_PORT"
 
@@ -44,7 +44,7 @@ K3D_NUM_WORKERS=0
 
 K3D_EXTRA_ARGS="${K3D_EXTRA_ARGS:-}"
 
-K3D_ARGS="--wait --no-lb --api-port ${K3D_API_PORT} --network ${K3D_NETWORK_NAME} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
+K3D_ARGS="--api-port ${K3D_API_PORT} --network ${K3D_NETWORK_NAME} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
 
 # set to anything for setting up /etc/hosts for the registry
 K3D_SETUP_HOSTS=${K3D_SETUP_HOSTS:-}
@@ -65,13 +65,60 @@ export PATH=$PATH:$(dirname $K3D_INSTALL_EXE)
     K3D_SETUP_HOSTS=1
 }
 
+# get_local_ip
+# try to get the local IP address
+get_local_ip() {
+    if command_exists ip; then
+        ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+'
+    elif command_exists ifconfig; then
+        ifconfig |
+            grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' |
+            grep -Eo '([0-9]*\.){3}[0-9]*' |
+            grep -v '172.17' |
+            grep -v '127.0.0.1' | head -n 1
+    elif command_exists hostname; then
+        hostname -I | cut -d' ' -f1
+    elif command_exists ipconfig; then
+        ipconfig getifaddr en0 | head -n 1
+    fi
+}
+
 get_container_ips() {
     local cont="$1"
     docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$cont"
 }
 
+get_k3d_apiserver_cont_name() {
+    if docker inspect "k3d-$K3D_CLUSTER_NAME-serverlb" >/dev/null 2>&1; then
+        echo "k3d-$K3D_CLUSTER_NAME-serverlb"
+    else
+        echo "k3d-$K3D_CLUSTER_NAME-server-0"
+    fi
+}
+
+get_k3d_apiserver_ip() {
+    get_container_ips "$(get_k3d_apiserver_cont_name)" | cut -d" " -f1
+}
+
+# gets the container name of the (first) server
+get_k3d_server_cont_name() {
+    echo "k3d-$K3D_CLUSTER_NAME-server-0"
+}
+
 get_k3d_server_ip() {
-    get_container_ips "k3d-$K3D_CLUSTER_NAME-server-0" | cut -d" " -f1
+    get_container_ips "$(get_k3d_server_cont_name)" | cut -d" " -f1
+}
+
+get_k3d_api_server_addrs() {
+    echo "https://$(get_k3d_apiserver_cont_name):${K3D_API_PORT}" \
+        "https://$(get_k3d_apiserver_ip):${K3D_API_PORT}" \
+        "https://$(get_k3d_apiserver_cont_name):6443" \
+        "https://$(get_k3d_apiserver_ip):6443" \
+        "https://localhost:${K3D_API_PORT}" \
+        "https://127.0.0.1:${K3D_API_PORT}" \
+        "https://$(get_k3d_server_cont_name):${K3D_API_PORT}" \
+        "https://$(get_k3d_server_ip):${K3D_API_PORT}" \
+        "https://$(get_local_ip):${K3D_API_PORT}"
 }
 
 check_registry_exists() {
@@ -138,7 +185,10 @@ create_cluster() {
     create_registry || abort "could not create registry"
 
     info "Creating k3d cluster $K3D_CLUSTER_NAME..."
-    KUBECONFIG="$K3D_KUBECONFIG" $K3D_EXE cluster create --agents $K3D_NUM_WORKERS $K3D_ARGS "$K3D_CLUSTER_NAME" || abort
+    KUBECONFIG="$K3D_KUBECONFIG" \
+        $K3D_EXE cluster create \
+        --agents $K3D_NUM_WORKERS \
+        $K3D_ARGS "$K3D_CLUSTER_NAME" || abort
     sleep 3
 
     [ -n "$K3D_REPLACE_HOST" ] && replace_ip_kubeconfig "$K3D_KUBECONFIG"
@@ -249,6 +299,7 @@ get-env)
     export_env "CLUSTER_SIZE" "$((K3D_NUM_WORKERS + 1))"
     export_env "CLUSTER_MACHINE"
     export_env "CLUSTER_REGION"
+    export_env "CLUSTER_API_ADDRS" "$(get_k3d_api_server_addrs)"
 
     # k3d-specific vars
     export_env "K3D_CLUSTER_NAME" "$K3D_CLUSTER_NAME"

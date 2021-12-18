@@ -329,6 +329,7 @@ get-env)
 	export_env "CLUSTER_SIZE" "$GKE_CLUSTER_NUM_NODES"
 	export_env "CLUSTER_MACHINE" "$GKE_CLUSTER_MACHINE_TYPE"
 	export_env "CLUSTER_REGION" "$GKE_LOC_REGION"
+	export_env "CLUSTER_API_ADDRS" ""
 
 	# GKE-specific variables
 	export_env "GKE_CLUSTER" "$GKE_CLUSTER"

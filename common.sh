@@ -55,6 +55,7 @@ EXE_HELM=${HELM:-$EXE_DIR/helm}
 # some versions
 KUBECTL_VERSION="1.15.3"
 KUBERNAUT_VERSION="2018.10.24-d46c1f1"
+HELM_VERSION="v3.7.2"
 OPERATOR_SDK_VERSION="v0.15.1"
 GOLINT_VERSION="latest"
 
@@ -63,7 +64,7 @@ EXE_KUBECTL_URL="https://storage.googleapis.com/kubernetes-release/release/v${KU
 EXE_OSDK_URL="https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu"
 EXE_GOLINT_URL="https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
 EXE_SHFMT_URL="https://github.com/mvdan/sh/releases/download/v2.6.4/shfmt_v2.6.4_linux_amd64"
-HELM_TAR_URL="https://get.helm.sh/helm-v3.0.3-linux-amd64.tar.gz"
+HELM_TAR_URL="https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
 
 ########################################################################################################################
 # utils

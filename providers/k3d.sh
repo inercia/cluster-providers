@@ -18,6 +18,8 @@ EXE_DIR=${EXE_DIR:-/usr/local/bin}
 
 K3D_EXE="k3d"
 
+K3D_VERSION="v5.2.0"
+
 K3D_INSTALL_EXE="$EXE_DIR/k3d"
 
 K3D_INST_URL="https://raw.githubusercontent.com/rancher/k3d/main/install.sh"
@@ -207,9 +209,9 @@ case $1 in
 #
 setup)
     if ! command_exists $K3D_EXE; then
-        info "Installing k3d"
+        info "Installing k3d (version '$K3D_VERSION')"
 
-        curl -s "$K3D_INST_URL" | bash
+        curl -s "$K3D_INST_URL" | TAG="$K3D_VERSION" bash
         [ $? -eq 0 ] || abort "could not download K3D from $K3D_INST_URL"
 
         # chmod +x ./k3d

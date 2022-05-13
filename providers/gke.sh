@@ -40,6 +40,8 @@ num="${TRAVIS_BUILD_ID:-0}"
 
 #########################################################################################
 
+DOCKER=${DOCKER:-docker}
+
 EXE_DIR=${EXE_DIR:-/usr/local/bin}
 
 # installation directory
@@ -133,7 +135,7 @@ gke_docker_registry() {
 gke_docker_registry_login() {
 	info "Configuring the Docker registry"
 	$EXE_GCLOUD auth print-access-token |
-		docker login -u oauth2accesstoken --password-stdin "https://${GKE_REGISTRY_HOST}" ||
+		$DOCKER login -u oauth2accesstoken --password-stdin "https://${GKE_REGISTRY_HOST}" ||
 		abort "could not authenticate for Docker on ${GKE_REGISTRY_HOST}"
 	passed "... Docker registry configured for ${GKE_REGISTRY_HOST}"
 }

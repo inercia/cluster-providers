@@ -63,7 +63,7 @@ create_cluster() {
     info "Creating a registry container (unless it already exists)..."
     running="$(docker inspect -f '{{.State.Running}}' "${KIND_REGISTRY_NAME}" 2>/dev/null || true)"
     if [ "${running}" != 'true' ]; then
-      docker run \
+      $DOCKER run \
         --rm -d --restart=always \
         -p "${KIND_REGISTRY_PORT}:5000" \
         --name "${KIND_REGISTRY_NAME}" \

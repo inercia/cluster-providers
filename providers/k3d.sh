@@ -46,7 +46,7 @@ K3D_NUM_WORKERS=0
 
 K3D_EXTRA_ARGS="${K3D_EXTRA_ARGS:-}"
 
-K3D_ARGS="--api-port ${K3D_API_PORT} --network ${K3D_NETWORK_NAME} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
+K3D_ARGS="--kubeconfig-update-default --api-port ${K3D_API_PORT} --network ${K3D_NETWORK_NAME} --registry-use ${K3D_REGISTRY_NAME} ${K3D_EXTRA_ARGS}"
 
 # set to anything for setting up /etc/hosts for the registry
 K3D_SETUP_HOSTS=${K3D_SETUP_HOSTS:-}
@@ -196,7 +196,7 @@ create_cluster() {
     [ -n "$K3D_REPLACE_HOST" ] && replace_ip_kubeconfig "$K3D_KUBECONFIG"
 
     info "Showing some k3d cluster info:"
-    kubectl --kubeconfig="$K3D_KUBECONFIG" cluster-info || abort
+    kubectl --kubeconfig="$K3D_KUBECONFIG" cluster-info || abort "could not get cluster info from K3D"
 }
 
 #########################################################################################

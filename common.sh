@@ -40,33 +40,6 @@ END='\033[0m'
 BLOCK='\033[1;47m'
 
 ########################################################################################################################
-# tools
-########################################################################################################################
-
-EXE_DIR=${EXE_DIR:-/usr/local/bin}
-
-# some executables
-EXE_SIEGE="siege"
-EXE_KUBECTL=${KUBECTL:-$EXE_DIR/kubectl}
-EXE_OSDK=${OSDK:-$EXE_DIR/operator-sdk}
-EXE_SHFMT=${SHFMT:-$EXE_DIR/shfmt}
-EXE_HELM=${HELM:-$EXE_DIR/helm}
-
-# some versions
-KUBECTL_VERSION="1.15.3"
-KUBERNAUT_VERSION="2018.10.24-d46c1f1"
-HELM_VERSION="v3.7.2"
-OPERATOR_SDK_VERSION="v0.15.1"
-GOLINT_VERSION="latest"
-
-# the URLs where some EXEs are available
-EXE_KUBECTL_URL="https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-EXE_OSDK_URL="https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu"
-EXE_GOLINT_URL="https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
-EXE_SHFMT_URL="https://github.com/mvdan/sh/releases/download/v2.6.4/shfmt_v2.6.4_linux_amd64"
-HELM_TAR_URL="https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
-
-########################################################################################################################
 # utils
 ########################################################################################################################
 

@@ -38,6 +38,8 @@ KIND_REGISTRY_NAME="${KIND_REGISTRY_NAME:-registry.localhost}"
 
 KIND_REGISTRY_PORT="${KIND_REGISTRY_PORT:-5000}"
 
+KIND_REGISTRY_IMAGE="${KIND_REGISTRY_IMAGE:-docker.io/library/registry:2}"
+
 KIND_REGISTRY="$KIND_REGISTRY_NAME:$KIND_REGISTRY_PORT"
 
 KIND_NUM_WORKERS=0
@@ -69,7 +71,7 @@ create_cluster() {
         --rm -d \
         -p "${KIND_REGISTRY_PORT}:5000" \
         --name "${KIND_REGISTRY_NAME}" \
-        registry:2 || abort "when creating registry"
+        "${KIND_REGISTRY_IMAGE}" || abort "when creating registry"
     fi
   fi
 

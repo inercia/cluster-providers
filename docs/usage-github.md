@@ -49,7 +49,7 @@ jobs:
             provider: k3d
             command: create
         env:
-            K3D_EXTRA_ARGS: --server-arg '--no-deploy=traefik'
+            K3D_EXTRA_ARGS: "--k3s-arg \"--no-deploy=traefik@server:*\""
 
       - name: Test the cluster created
         run: |

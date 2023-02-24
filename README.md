@@ -29,7 +29,7 @@ jobs:
             command: create
         # we can pass some advanced, provider-specific configuration in env variables
         env:
-            K3D_EXTRA_ARGS: --server-arg '--no-deploy=traefik'
+            K3D_EXTRA_ARGS: "--k3s-arg \"--no-deploy=traefik@server:*\""
 
       - name: Test the cluster we created
         # KUBECONFIG has been set by the previous step: kubectl should work fine

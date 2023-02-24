@@ -14,6 +14,8 @@ num="${TRAVIS_BUILD_ID:-0}"
 
 #########################################################################################
 
+DOCKER=${DOCKER:-docker}
+
 EXE_DIR=${EXE_DIR:-/usr/local/bin}
 
 KIND_EXE="kind"
@@ -64,7 +66,7 @@ create_cluster() {
     running="$(docker inspect -f '{{.State.Running}}' "${KIND_REGISTRY_NAME}" 2>/dev/null || true)"
     if [ "${running}" != 'true' ]; then
       $DOCKER run \
-        --rm -d --restart=always \
+        --rm -d \
         -p "${KIND_REGISTRY_PORT}:5000" \
         --name "${KIND_REGISTRY_NAME}" \
         registry:2 || abort "when creating registry"

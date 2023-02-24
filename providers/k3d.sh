@@ -40,6 +40,8 @@ fi
 
 K3D_REGISTRY_PORT="${K3D_REGISTRY_PORT:-5011}"
 
+K3D_REGISTRY_IMAGE="${K3D_REGISTRY_IMAGE:-docker.io/library/registry:2}"
+
 K3D_REGISTRY="$K3D_REGISTRY_NAME:$K3D_REGISTRY_PORT"
 
 K3D_NUM_WORKERS=0
@@ -148,7 +150,8 @@ create_registry() {
     else
         info "Creating k3d registry..."
         $K3D_EXE registry create "$K3D_REGISTRY_NAME" \
-            --port $K3D_REGISTRY_PORT || abort "could not create registry"
+            -i "$K3D_REGISTRY_IMAGE" \
+            --port "$K3D_REGISTRY_PORT" || abort "could not create registry"
     fi
 
     local registry_ip="127.0.0.1"

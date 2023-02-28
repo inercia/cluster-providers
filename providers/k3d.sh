@@ -40,7 +40,7 @@ fi
 
 K3D_REGISTRY_PORT="${K3D_REGISTRY_PORT:-5011}"
 
-K3D_REGISTRY_IMAGE="${K3D_REGISTRY_IMAGE:-docker.io/library/registry:2}"
+K3D_REGISTRY_IMAGE="${K3D_REGISTRY_IMAGE:-}"
 
 K3D_REGISTRY="$K3D_REGISTRY_NAME:$K3D_REGISTRY_PORT"
 
@@ -146,12 +146,18 @@ replace_ip_kubeconfig() {
 
 create_registry() {
     if check_registry_exists; then
-        info "k3d registry alreay exists"
+        info "k3d registry already exists"
     else
         info "Creating k3d registry..."
-        $K3D_EXE registry create "$K3D_REGISTRY_NAME" \
-            -i "$K3D_REGISTRY_IMAGE" \
-            --port "$K3D_REGISTRY_PORT" || abort "could not create registry"
+        local args=(registry create "$K3D_REGISTRY_NAME" --port "$K3D_REGISTRY_PORT")
+        if [ -n "${K3D_REGISTRY_IMAGE}" ]; then
+            args+=(-i "$K3D_REGISTRY_IMAGE")
+            info "Pulling registry image... $K3D_REGISTRY_IMAGE"
+            docker pull "$K3D_REGISTRY_IMAGE"
+            info "Importing registry image into k3d... $K3D_REGISTRY_IMAGE"
+            k3d image import "$K3D_REGISTRY_IMAGE"
+        fi
+        $K3D_EXE "${args[@]}" || abort "could not create registry"
     fi
 
     local registry_ip="127.0.0.1"

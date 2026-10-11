@@ -2,8 +2,9 @@
 
 ## k3d
 
-The `k3d` provider create a local Kubernetes cluster with the
-latest, stable version of [k3d](github.com/rancher/k3d).
+The `k3d` provider creates a local Kubernetes cluster with
+[k3d](https://github.com/k3d-io/k3d). Setup installs `v5.2.0` by default
+when no k3d executable is available; an existing executable is left unchanged.
 
 ### Additional input variables for advanced configuration
 
@@ -11,6 +12,17 @@ The `k3d` cluster provider supports some environment variables for tweaking
 the configuration:
 
 - `K3D_EXTRA_ARGS`: custom arguments for `k3d create`.
+- `K3D_VERSION`: k3d CLI release tag to install, such as `v5.8.3` or
+  `v5.8.0-rc.1`. Defaults to `v5.2.0` only when unset. Empty values and
+  malformed tags abort with an error; unavailable releases fail during installation.
+  This selects the CLI version, not the Kubernetes version (`CLUSTER_VERSION`).
+- `EXE_DIR`: installation directory for the k3d executable (default `/usr/local/bin`).
+
+Export `K3D_VERSION` before invoking setup and keep it in the environment for
+subsequent provider commands. Setup passes it unchanged as the official
+installer's `TAG`. `get-env` returns the configured `K3D_VERSION`, not the
+version of an already installed executable. To change an existing executable,
+manage it separately before setup.
 
 ## KIND
 

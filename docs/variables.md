@@ -13,6 +13,8 @@
 * `CLUSTER_REGION`: cluster location (ie, `us-east1-b` on GKE).
 * `CLUSTER_REGISTRY`: (supported by some providers) custom name for the registry in the cluster.
 * `CLUSTER_VERSION`: (supported by some providers) the version of Kubernetes.
+* `K3D_VERSION`: k3d CLI release tag for setup (default `v5.2.0` when unset).
+  See the [k3d provider](providers.md#k3d) for validation and installation behavior.
 
 
 ## Output variables: getting info for using the cluster
@@ -28,6 +30,8 @@
   not provided by all the cluster providers. The list contains all the possible
   addresses where the API server can be located. It is responsability of the caller
   to check which ones are reachable.
+* `K3D_VERSION`: (k3d only) configured CLI release tag, preserved across `get-env`.
+  It does not report the version of an existing executable.
 
 In some environments you can get:
 

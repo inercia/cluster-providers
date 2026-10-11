@@ -53,7 +53,7 @@ jobs:
             command: create
         env:
             K3D_VERSION: v5.8.3
-            K3D_EXTRA_ARGS: "--k3s-arg \"--no-deploy=traefik@server:*\""
+            K3D_EXTRA_ARGS: "--k3s-arg --disable=traefik@server:*"
 
       - name: Test the cluster created
         run: |

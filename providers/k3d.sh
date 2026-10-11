@@ -18,11 +18,14 @@ EXE_DIR=${EXE_DIR:-/usr/local/bin}
 
 K3D_EXE="k3d"
 
-K3D_VERSION="v5.2.0"
+K3D_VERSION="${K3D_VERSION-v5.2.0}"
+
+[[ "$K3D_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?$ ]] ||
+    abort "invalid K3D_VERSION: expected a release tag such as v5.8.3 or v5.8.0-rc.1"
 
 K3D_INSTALL_EXE="$EXE_DIR/k3d"
 
-K3D_INST_URL="https://raw.githubusercontent.com/rancher/k3d/main/install.sh"
+K3D_INST_URL="https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh"
 
 K3D_CLUSTER_NAME="${CLUSTER_NAME:-cluster-$user-$num}"
 
@@ -220,12 +223,11 @@ setup)
     if ! command_exists $K3D_EXE; then
         info "Installing k3d (version '$K3D_VERSION')"
 
-        curl -s "$K3D_INST_URL" | TAG="$K3D_VERSION" bash
-        [ $? -eq 0 ] || abort "could not download K3D from $K3D_INST_URL"
-
-        # chmod +x ./k3d
-        # mkdir -p "$(dirname $K3D_INSTALL_EXE)"
-        # mv ./k3d $K3D_INSTALL_EXE
+        # Fetch completely before execution so failed downloads cannot run partial scripts.
+        installer=$(curl -fsSL "$K3D_INST_URL") ||
+            abort "could not download K3D from $K3D_INST_URL"
+        TAG="$K3D_VERSION" K3D_INSTALL_DIR="$EXE_DIR" bash <<< "$installer" ||
+            abort "could not install k3d version $K3D_VERSION"
 
         command_exists $K3D_EXE || abort "could not install k3d"
     else
@@ -260,7 +262,7 @@ create)
     if ! command_exists k3d; then
         warn "No k3d command found. Install k3d or use a different CLUSTER_PROVIDER."
         info "You can manually install k3d with:"
-        info "curl -s $K3D_INST_URL | bash"
+        info "curl -fsSL $K3D_INST_URL | TAG='$K3D_VERSION' K3D_INSTALL_DIR='$EXE_DIR' bash"
         abort "no k3d executable found"
     fi
 
@@ -313,6 +315,7 @@ get-env)
     export_env "CLUSTER_API_ADDRS" "$(get_k3d_api_server_addrs)"
 
     # k3d-specific vars
+    export_env "K3D_VERSION" "$K3D_VERSION"
     export_env "K3D_CLUSTER_NAME" "$K3D_CLUSTER_NAME"
     export_env "K3D_NETWORK_NAME" "$K3D_NETWORK_NAME"
     export_env "K3D_API_PORT" "$K3D_API_PORT"

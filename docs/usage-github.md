@@ -25,6 +25,9 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 Cluster providers usually support some advanced configuration through
 environment variable. Check out the list of env vars for each [provider](providers.md).
 These environmenta variables should be passed through an `env` map.
+For k3d, set `K3D_VERSION: v5.8.3` in that map to select the CLI release
+installed by setup without updating the cluster-providers revision.
+An existing k3d executable is not replaced.
 
 ## Outputs
 
@@ -49,6 +52,7 @@ jobs:
             provider: k3d
             command: create
         env:
+            K3D_VERSION: v5.8.3
             K3D_EXTRA_ARGS: "--k3s-arg \"--no-deploy=traefik@server:*\""
 
       - name: Test the cluster created
@@ -57,5 +61,5 @@ jobs:
 ```
 
 This uses [inercia/cluster-provider@master](https://www.github.com/inercia/cluster-provider)
-GitHub Action to spin up a [k3d](https://github.com/rancher/k3d/) Kubernetes cluster on
+GitHub Action to spin up a [k3d](https://github.com/k3d-io/k3d/) Kubernetes cluster on
 every Pull Request.

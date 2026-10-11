@@ -16,6 +16,19 @@ as well as some [customization with environment variables](#Configuring-the-clus
 
 ## Example
 
+Select the k3d CLI version independently of the cluster-providers revision:
+
+```bash
+export CLUSTER_PROVIDER=k3d
+export K3D_VERSION=v5.8.3
+./providers.sh setup
+./providers.sh create
+```
+
+For a sourced caller, export the same variables before `source providers.sh`
+and `cluster_provider setup`. Setup installs only when k3d is missing; it does
+not replace an existing binary. See [k3d configuration](providers.md#k3d).
+
 For example, we can create local k3d cluster with:
 
 ```console

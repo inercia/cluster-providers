@@ -7,6 +7,15 @@ on:
       - master
 
 jobs:
+  k3d-setup-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Test k3d setup without installing dependencies
+        run: bash tests/k3d-setup.sh
+
   k3d-test:
     runs-on: ubuntu-latest
     steps:
@@ -19,6 +28,7 @@ jobs:
             provider: k3d
             command: create
         env:
+            K3D_VERSION: v5.8.3
             K3D_EXTRA_ARGS: --k3s-arg --no-deploy=traefik@server:*
 
       - name: Test the k3d cluster created
